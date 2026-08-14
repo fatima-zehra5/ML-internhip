@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Performance Signals & Impressions Decline</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:#f5f7fa;
+  color:#17202a;
+  line-height:1.7;
+}
+.container{
+  max-width:1050px;
+  margin:auto;
+  padding:50px 22px 80px;
+}
+.hero{
+  background:#17202a;
+  color:white;
+  padding:55px 45px;
+  border-radius:24px;
+  margin-bottom:25px;
+}
+.label{
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:12px;
+  font-weight:bold;
+  opacity:.7;
+}
+h1{
+  font-size:clamp(32px,5vw,58px);
+  line-height:1.1;
+  margin:15px 0;
+}
+.hero p{
+  color:#d7dde3;
+  max-width:750px;
+  font-size:18px;
+}
+.card{
+  background:white;
+  border:1px solid #e1e6eb;
+  border-radius:20px;
+  padding:32px;
+  margin:22px 0;
+  box-shadow:0 8px 30px rgba(20,30,40,.04);
+}
+h2{
+  font-size:26px;
+  margin-top:0;
+}
+h3{
+  margin-bottom:5px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+.metric{
+  border:1px solid #e1e6eb;
+  border-radius:16px;
+  padding:20px;
+}
+.metric span{
+  color:#687582;
+  font-size:14px;
+}
+.metric strong{
+  display:block;
+  font-size:30px;
+  margin-top:5px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+th,td{
+  text-align:left;
+  padding:13px;
+  border-bottom:1px solid #e2e6ea;
+}
+th{
+  background:#f1f4f7;
+}
+.note{
+  background:#f0f5fb;
+  border-left:4px solid #315f9b;
+  padding:16px 20px;
+  border-radius:8px;
+}
+code{
+  background:#eef1f4;
+  padding:3px 6px;
+  border-radius:5px;
+}
+a{
+  color:#315f9b;
+}
+.footer{
+  text-align:center;
+  color:#687582;
+  margin-top:35px;
+  font-size:14px;
+}
+@media(max-width:800px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:500px){
+  .grid{grid-template-columns:1fr}
+  .hero,.card{padding:24px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HERO -->
+<section class="hero">
+<div class="label">Capstone Research Paper</div>
+
+<h1>
+Can search-performance signals help identify content likely to experience an impressions decline?
+</h1>
+
+<p>
+A directional machine-learning experiment for prioritizing content review and monitoring.
+</p>
+</section>
+
+
+<!-- 0 ABSTRACT -->
+<section class="card">
+<h2>Abstract</h2>
+
+<p>
+This study asks whether search-performance signals can help identify content items that may experience an impressions decline.
+The analysis uses aggregated and pseudonymized search-performance data, including daily content performance and query-level visibility signals.
+A Random Forest classifier is compared with a majority-class baseline using client-grouped validation so that testing includes previously unseen clients.
+The measured evaluation achieved 0.786 test accuracy and 0.754 macro F1 on 31,686 test rows from 12 held-out clients.
+The resulting output is intended for decision support, helping prioritize content for human review and monitoring rather than making causal claims or automatic search-engine decisions.
+</p>
+</section>
+
+
+<!-- 1 INTRODUCTION -->
+<section class="card">
+<h2>1. Introduction / Problem Statement</h2>
+
+<p>
+The decision supported by this analysis is which content items should receive review or monitoring when impressions may be declining.
+The unit of analysis is an aggregated content item.
+The output is a model-based risk signal that can be used to prioritize items for human review.
+</p>
+
+<p>
+Data and machine learning are useful here because multiple search-performance signals can be combined into one repeatable prioritization workflow.
+A wrong call can either spend editorial effort on a low-priority item or cause a potentially important item to be overlooked.
+For that reason, the model is treated as decision support rather than an automatic action engine.
+</p>
+</section>
+
+
+<!-- 2 DATA -->
+<section class="card">
+<h2>2. Data Safety &amp; Data</h2>
+
+<p>
+The study uses the pseudonymized internship warehouse release.
+The analysis uses aggregated content-level and query-level information rather than exposing raw search records.
+</p>
+
+<h3>Tables used</h3>
+
+<ul>
+<li><code>fact_content_daily_performance</code> — daily search-performance signals.</li>
+<li><code>fact_content_query_90d</code> — query-level visibility and concentration signals.</li>
+<li><code>dim_clients</code> — available client history used for grouping and understanding the data.</li>
+</ul>
+
+<h3>Analysis window</h3>
+
+<p>
+A 90-day analysis window was used with a minimum previous-period impression threshold of 200.
+Content items without sufficient history were excluded.
+</p>
+
+<h3>Safety and exclusions</h3>
+
+<p>
+Client names, domains, private queries, credentials and raw exports are excluded from the public analysis.
+The pseudonymous client identifier is used for grouping during validation and is not used as a predictive feature.
+</p>
+</section>
+
+
+<!-- 3 METHODOLOGY -->
+<section class="card">
+<h2>3. Methodology</h2>
+
+<h3>Features</h3>
+
+<ul>
+<li>Previous-period impressions</li>
+<li>Query visibility</li>
+<li>Rare and anonymized impression shares</li>
+<li>Top-query share</li>
+<li>Ranking-position volatility</li>
+</ul>
+
+<h3>Target definition</h3>
+
+<p>
+A content item is classified as declining when its latest-period impressions are below 80% of its previous-period impressions.
+</p>
+
+<h3>Model</h3>
+
+<p>
+A Random Forest classifier is used as the predictive model.
+A majority-class rule is used as the transparent baseline.
+</p>
+
+<h3>Validation</h3>
+
+<p>
+Instead of a random row-level split, GroupShuffleSplit is used with
+<code>client_hash_id</code> as the grouping variable.
+This keeps clients separated between training and testing and provides a more realistic test of generalization to unseen clients.
+</p>
+
+<h3>Leakage checks</h3>
+
+<p>
+Features are calculated from information available before the outcome being evaluated.
+Label-derived fields are not used as predictive features.
+The pseudonymous client identifier is used only for grouping.
+Fixed random seeds support reproducibility.
+</p>
+</section>
+
+
+<!-- 4 RESULTS -->
+<section class="card">
+<h2>4. Results vs Baseline</h2>
+
+<p>
+The model was evaluated using client-grouped validation.
+The reported evaluation contains 34 training clients and 12 testing clients.
+</p>
+
+<div class="grid">
+
+<div class="metric">
+<span>Test Accuracy</span>
+<strong>0.786</strong>
+</div>
+
+<div class="metric">
+<span>Macro F1</span>
+<strong>0.754</strong>
+</div>
+
+<div class="metric">
+<span>Weighted F1</span>
+<strong>0.786</strong>
+</div>
+
+<div class="metric">
+<span>Test Rows</span>
+<strong>31,686</strong>
+</div>
+
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Evaluation metric</th>
+<th>Measured value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Test accuracy</td>
+<td>0.786</td>
+</tr>
+
+<tr>
+<td>Macro F1-score</td>
+<td>0.754</td>
+</tr>
+
+<tr>
+<td>Weighted F1-score</td>
+<td>0.786</td>
+</tr>
+
+<tr>
+<td>Training clients</td>
+<td>34</td>
+</tr>
+
+<tr>
+<td>Testing clients</td>
+<td>12</td>
+</tr>
+
+<tr>
+<td>Test rows</td>
+<td>31,686</td>
+</tr>
+</tbody>
+</table>
+
+<div class="note">
+<strong>Honest interpretation:</strong>
+These are measured, directional results from the tested experiment.
+They should not be interpreted as causal evidence or as guaranteed future performance.
+The available capstone materials do not provide a numeric majority-class baseline score, so no baseline number is invented here.
+</div>
+
+</section>
+
+
+<!-- 5 LIMITATIONS -->
+<section class="card">
+<h2>5. Limitations &amp; Honest Framing</h2>
+
+<ul>
+
+<li>
+The dataset is pseudonymized, so individual clients and domains cannot be identified.
+</li>
+
+<li>
+The results describe associations in the available search-performance data and do not establish causation.
+</li>
+
+<li>
+Performance may vary for clients or content outside the tested sample.
+</li>
+
+<li>
+The evaluation covers 12 unseen clients, so the result should not be treated as a universal performance estimate.
+</li>
+
+<li>
+The model identifies content that may warrant review; it does not guarantee that a recommended action will improve search performance.
+</li>
+
+<li>
+Aggregated and anonymized query-level data limits visibility into detailed search behavior.
+</li>
+
+</ul>
+</section>
+
+
+<!-- 6 RECOMMENDATIONS -->
+<section class="card">
+<h2>6. Ranked Recommendations</h2>
+
+<ol>
+
+<li>
+<strong>Review high-risk declining content first.</strong>
+Prioritize content items that the model identifies as likely to decline.
+</li>
+
+<li>
+<strong>Investigate ranking-position volatility.</strong>
+Content with unstable position signals should receive additional monitoring.
+</li>
+
+<li>
+<strong>Review query concentration.</strong>
+Highly concentrated query visibility may indicate dependence on a small number of search queries.
+</li>
+
+<li>
+<strong>Prioritize sufficient historical evidence.</strong>
+Stronger historical evidence should be preferred over very low-volume content.
+</li>
+
+<li>
+<strong>Keep a human in the loop.</strong>
+Use the model as a review-prioritization tool rather than automatically triggering content changes.
+</li>
+
+</ol>
+</section>
+
+
+<!-- 7 ARTIFACTS -->
+<section class="card">
+<h2>7. Artifacts &amp; Evaluation Evidence</h2>
+
+<p>
+The main artifact is the client-grouped model evaluation.
+The capstone notebook contains the analysis workflow, feature construction, model training and evaluation.
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Test accuracy</td>
+<td>0.786</td>
+</tr>
+
+<tr>
+<td>Macro F1</td>
+<td>0.754</td>
+</tr>
+
+<tr>
+<td>Weighted F1</td>
+<td>0.786</td>
+</tr>
+
+<tr>
+<td>Testing clients</td>
+<td>12</td>
+</tr>
+
+<tr>
+<td>Training clients</td>
+<td>34</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+These artifacts provide a compact view of the measured evaluation.
+The results are intended to support content-review prioritization.
+</p>
+</section>
+
+
+<!-- 8 REPRODUCIBILITY -->
+<section class="card">
+<h2>8. Reproducibility</h2>
+
+<p>
+The analysis was developed as a Python notebook workflow using aggregated warehouse data,
+feature engineering, scikit-learn modeling and client-grouped validation.
+Fixed random seeds were used for reproducibility.
+</p>
+
+<p>
+The main capstone notebook is available in the public repository:
+</p>
+
+<p>
+<a href="https://github.com/fatima-zehra5/ML-internship/blob/main/work/notebooks/capstone.ipynb">
+View the capstone notebook
+</a>
+</p>
+
+<p>
+The repository contains the internship notebooks and project work under
+<code>work/</code>.
+No credentials, private queries, client-identifying information or raw exports are included in the public analysis.
+</p>
+</section>
+
+
+<!-- 9 ACKNOWLEDGMENTS -->
+<section class="card">
+<h2>9. Acknowledgments &amp; Data Credit</h2>
+
+<p>
+Built on the FlyRank ML Internship dataset.
+</p>
+
+<p>
+<a href="https://flyrank.ai" target="_blank" rel="noopener">
+FlyRank
+</a>
+</p>
+
+</section>
+
+
+<div class="footer">
+Observed · Measured · Directional · Decision-support
+</div>
+
+</div>
+
+</body>
+</html>
